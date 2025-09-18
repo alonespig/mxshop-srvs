@@ -9,22 +9,23 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
 type UserServer struct {
+	proto.UnimplementedUserServerServer
 }
 
-//type UserServerClient interface {
-// 	GetUserList(ctx context.Context, in *PageInfo, opts ...grpc.CallOption) (*UserListResponse, error)
-// 	GetUserByMobile(ctx context.Context, in *MobileRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
-// 	GetUserById(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
-// 	CreateUser(ctx context.Context, in *CreateUserInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
-// 	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*empty.Empty, error)
-// 	CheckPassWord(ctx context.Context, in *CheckPasswordInfo, opts ...grpc.CallOption) (*CheckResponse, error)
+// type UserServerServer interface {
+// 	GetUserList(context.Context, *PageInfo) (*UserListResponse, error)
+// 	GetUserByMobile(context.Context, *MobileRequest) (*UserInfoResponse, error)
+// 	GetUserById(context.Context, *IdRequest) (*UserInfoResponse, error)
+// 	CreateUser(context.Context, *CreateUserInfo) (*UserInfoResponse, error)
+// 	UpdateUser(context.Context, *UpdateUserInfo) (*empty.Empty, error)
+// 	CheckPassWord(context.Context, *CheckPasswordInfo) (*CheckResponse, error)
+// 	mustEmbedUnimplementedUserServerServer()
 // }
 
 func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
@@ -59,7 +60,7 @@ func ModelToResponse(user model.User) *proto.UserInfoResponse {
 }
 
 // GetUserList 获取用户列表
-func (u *UserServer) GetUserList(ctx context.Context, in *proto.PageInfo) (*proto.UserListResponse, error) {
+func GetUserList(ctx context.Context, req *proto.PageInfo) (*proto.UserListResponse, error) {
 	//获取用户列表
 	var users []model.User
 	result := global.DB.Find(&users)
@@ -70,7 +71,7 @@ func (u *UserServer) GetUserList(ctx context.Context, in *proto.PageInfo) (*prot
 
 	rsp.Total = int32(result.RowsAffected)
 
-	global.DB.Scopes(Paginate(int(in.Pn), int(in.PSize))).Find(&users)
+	global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
 
 	for _, user := range users {
 		rsp.Data = append(rsp.Data, ModelToResponse(user))
@@ -80,9 +81,9 @@ func (u *UserServer) GetUserList(ctx context.Context, in *proto.PageInfo) (*prot
 }
 
 // GetUserByMobile 根据手机号获取用户信息
-func (u *UserServer) GetUserByMobile(ctx context.Context, in *proto.MobileRequest, opts ...grpc.CallOption) (*proto.UserInfoResponse, error) {
+func (u *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobileRequest) (*proto.UserInfoResponse, error) {
 	var user model.User
-	result := global.DB.Where(&model.User{Mobile: in.Mobile}).First(&user)
+	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "用户不存在")
 	}
@@ -93,9 +94,9 @@ func (u *UserServer) GetUserByMobile(ctx context.Context, in *proto.MobileReques
 }
 
 // GetUserById 根据ID获取用户信息
-func (u *UserServer) GetUserById(ctx context.Context, in *proto.IdRequest, opts ...grpc.CallOption) (*proto.UserInfoResponse, error) {
+func (u *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*proto.UserInfoResponse, error) {
 	var user model.User
-	result := global.DB.First(&user, in.Id)
+	result := global.DB.First(&user, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "用户不存在")
 	}
@@ -106,17 +107,17 @@ func (u *UserServer) GetUserById(ctx context.Context, in *proto.IdRequest, opts 
 }
 
 // CreateUser 创建用户
-func (u *UserServer) CreateUser(ctx context.Context, in *proto.CreateUserInfo, opts ...grpc.CallOption) (*proto.UserInfoResponse, error) {
+func (u *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) (*proto.UserInfoResponse, error) {
 	var user model.User
-	result := global.DB.Where(&model.User{Mobile: in.Mobile}).First(&user)
+	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected > 0 {
 		return nil, status.Error(codes.AlreadyExists, "用户已存在")
 	}
 
-	user.Mobile = in.Mobile
-	user.NickName = in.NickName
+	user.Mobile = req.Mobile
+	user.NickName = req.NickName
 	// 生成哈希（自动加盐）
-	hash, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
@@ -129,16 +130,16 @@ func (u *UserServer) CreateUser(ctx context.Context, in *proto.CreateUserInfo, o
 }
 
 // UpdateUser 更新用户
-func (u *UserServer) UpdateUser(ctx context.Context, in *proto.UpdateUserInfo, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (u *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*empty.Empty, error) {
 	var user model.User
-	result := global.DB.First(&user, in.Id)
+	result := global.DB.First(&user, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
 
-	birthDay := time.Unix(int64(in.BirthDay), 0)
-	user.NickName = in.NickName
-	user.Gender = in.Gender
+	birthDay := time.Unix(int64(req.BirthDay), 0)
+	user.NickName = req.NickName
+	user.Gender = req.Gender
 	user.Birthday = &birthDay
 
 	result = global.DB.Save(&user)
@@ -151,10 +152,14 @@ func (u *UserServer) UpdateUser(ctx context.Context, in *proto.UpdateUserInfo, o
 }
 
 // CheckPassWord 检查密码
-func (u *UserServer) CheckPassWord(ctx context.Context, in *proto.CheckPasswordInfo, opts ...grpc.CallOption) (*proto.CheckResponse, error) {
+func (u *UserServer) CheckPassWord(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckResponse, error) {
 	// // 校验密码
-	err := bcrypt.CompareHashAndPassword([]byte(in.Password), []byte(in.EncryptedPassword))
+	err := bcrypt.CompareHashAndPassword([]byte(req.Password), []byte(req.EncryptedPassword))
 	return &proto.CheckResponse{
 		Success: err == nil,
 	}, nil
+}
+
+func (u *UserServer) mustEmbedUnimplementedUserServerServer() {
+	// panic("unimplemented")
 }
