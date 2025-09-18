@@ -5,7 +5,9 @@ import (
 	"mxshop/global"
 	"mxshop/model"
 	"mxshop/proto"
+	"time"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -124,4 +126,35 @@ func (u *UserServer) CreateUser(ctx context.Context, in *proto.CreateUserInfo, o
 		return nil, status.Error(codes.Internal, "创建用户失败")
 	}
 	return ModelToResponse(user), nil
+}
+
+// UpdateUser 更新用户
+func (u *UserServer) UpdateUser(ctx context.Context, in *proto.UpdateUserInfo, opts ...grpc.CallOption) (*empty.Empty, error) {
+	var user model.User
+	result := global.DB.First(&user, in.Id)
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
+
+	birthDay := time.Unix(int64(in.BirthDay), 0)
+	user.NickName = in.NickName
+	user.Gender = in.Gender
+	user.Birthday = &birthDay
+
+	result = global.DB.Save(&user)
+
+	if result.Error != nil {
+		return nil, status.Error(codes.Internal, "更新用户失败")
+	}
+
+	return &empty.Empty{}, nil
+}
+
+// CheckPassWord 检查密码
+func (u *UserServer) CheckPassWord(ctx context.Context, in *proto.CheckPasswordInfo, opts ...grpc.CallOption) (*proto.CheckResponse, error) {
+	// // 校验密码
+	err := bcrypt.CompareHashAndPassword([]byte(in.Password), []byte(in.EncryptedPassword))
+	return &proto.CheckResponse{
+		Success: err == nil,
+	}, nil
 }
