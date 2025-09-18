@@ -6,6 +6,9 @@ import (
 	"mxshop/model"
 	"mxshop/proto"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -37,7 +40,7 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-func ModelToResponse(user model.User) proto.UserInfoResponse {
+func ModelToResponse(user model.User) *proto.UserInfoResponse {
 	//在grpc的message中字段有默认值，不能随便赋值nil进去，容易出错
 	userInfoRsp := proto.UserInfoResponse{
 		Id:       int32(user.ID),
@@ -49,9 +52,10 @@ func ModelToResponse(user model.User) proto.UserInfoResponse {
 	if user.Birthday != nil {
 		userInfoRsp.BirthDay = uint64(user.Birthday.Unix())
 	}
-	return userInfoRsp
+	return &userInfoRsp
 }
 
+// GetUserList 获取用户列表
 func (u *UserServer) GetUserList(ctx context.Context, in *proto.PageInfo) (*proto.UserListResponse, error) {
 	//获取用户列表
 	var users []model.User
@@ -66,9 +70,34 @@ func (u *UserServer) GetUserList(ctx context.Context, in *proto.PageInfo) (*prot
 	global.DB.Scopes(Paginate(int(in.Pn), int(in.PSize))).Find(&users)
 
 	for _, user := range users {
-		userInfoRsp := ModelToResponse(user)
-		rsp.Data = append(rsp.Data, &userInfoRsp)
+		rsp.Data = append(rsp.Data, ModelToResponse(user))
 	}
 
 	return rsp, nil
+}
+
+// GetUserByMobile 根据手机号获取用户信息
+func (u *UserServer) GetUserByMobile(ctx context.Context, in *proto.MobileRequest, opts ...grpc.CallOption) (*proto.UserInfoResponse, error) {
+	var user model.User
+	result := global.DB.Where(&model.User{Mobile: in.Mobile}).First(&user)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "用户不存在")
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return ModelToResponse(user), nil
+}
+
+// GetUserById 根据ID获取用户信息
+func (u *UserServer) GetUserById(ctx context.Context, in *proto.IdRequest, opts ...grpc.CallOption) (*proto.UserInfoResponse, error) {
+	var user model.User
+	result := global.DB.First(&user, in.Id)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "用户不存在")
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return ModelToResponse(user), nil
 }
