@@ -11,6 +11,6 @@ func InitUserRouter(Router *gin.RouterGroup) {
 	UserRouter := Router.Group("user")
 	zap.L().Info("配置用户相关的url")
 	{
-		UserRouter.GET("list", api.GetUserList)
+		UserRouter.GET("/list", api.GetUserList)
 	}
 }
