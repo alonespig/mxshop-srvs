@@ -14,4 +14,10 @@ type ServerConfig struct {
 	Port        int           `mapstructure:"port" json:"port"`
 	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
 	JwtInfo     JwtConfig     `mapstructure:"jwt" json:"jwt"`
+	RedisInfo   RedisConfig   `mapstructure:"redis" json:"redis"`
+}
+
+type RedisConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port int    `mapstructure:"port" json:"port"`
 }

@@ -156,3 +156,37 @@ func PassWordLogin(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "登录失败，密码错误"})
 	}
 }
+
+func Register(c *gin.Context) {
+	registerForm := forms.RegisterForm{}
+	if err := c.ShouldBindJSON(&registerForm); err != nil {
+		zap.L().Error("[Register] 绑定参数失败", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserSrvInfo.Host,
+		global.ServerConfig.UserSrvInfo.Port), grpc.WithInsecure())
+	if err != nil {
+		zap.L().Error("[Register] 连接用户服务失败", zap.Error(err))
+		return
+	}
+
+	defer userConn.Close()
+	userSrvClient := proto.NewUserServerClient(userConn)
+
+	user, err := userSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
+		NickName: registerForm.Mobile,
+		Mobile:   registerForm.Mobile,
+		Password: registerForm.PassWord,
+	})
+	if err != nil {
+		zap.L().Error("[Register] 调用用户服务失败", zap.Error(err))
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	zap.L().Info("[Register] 注册成功", zap.Any("user", user))
+
+	c.JSON(http.StatusOK, gin.H{"msg": "注册成功"})
+}

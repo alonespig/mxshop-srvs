@@ -7,3 +7,7 @@ user_srv:
 
 jwt:
   key: '897b246533bba9c636ea6c1039a858b1'
+
+redis:
+  host: '127.0.0.1'
+  port: 6379
