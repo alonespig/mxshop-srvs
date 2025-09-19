@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"mxshop-api/user-web/middlewares"
 	"mxshop-api/user-web/router"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
+	Router.Use(middlewares.Cors())
 
 	ApiGroup := Router.Group("v1")
 
