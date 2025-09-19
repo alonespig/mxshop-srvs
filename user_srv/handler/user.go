@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 	"mxshop/global"
 	"mxshop/model"
 	"mxshop/proto"
@@ -156,7 +157,10 @@ func (u *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 func (u *UserServer) CheckPassWord(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckResponse, error) {
 	// // 校验密码
 	// First argument must be the hashed password, second is the plain text
+	log.Println("req.EncryptedPassword", req.EncryptedPassword)
+	log.Println("req.Password", req.Password)
 	err := bcrypt.CompareHashAndPassword([]byte(req.EncryptedPassword), []byte(req.Password))
+	log.Println("err", err)
 	return &proto.CheckResponse{
 		Success: err == nil,
 	}, nil

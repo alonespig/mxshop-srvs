@@ -5,3 +5,5 @@ user_srv:
   host: '127.0.0.1'
   port: 50051
 
+jwt:
+  key: '897b246533bba9c636ea6c1039a858b1'
