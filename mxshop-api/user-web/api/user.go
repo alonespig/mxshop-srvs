@@ -94,6 +94,13 @@ func PassWordLogin(c *gin.Context) {
 		return
 	}
 
+	ok := store.Verify(passWordLoginForm.CaptchaId, passWordLoginForm.Captcha, true)
+
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "验证码错误"})
+		return
+	}
+
 	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserSrvInfo.Host,
 		global.ServerConfig.UserSrvInfo.Port), grpc.WithInsecure())
 	if err != nil {
