@@ -4,19 +4,25 @@ import (
 	"flag"
 	"fmt"
 	"mxshop/handler"
+	"mxshop/initialize"
 	"mxshop/proto"
 	"net"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	initialize.InitLogger()
+	initialize.InitConfig()
+	initialize.InitDB()
 
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
 	Port := flag.Int("port", 50051, "端口号")
 
 	flag.Parse()
-	fmt.Println("ip:", *IP, "port:", *Port)
+
+	zap.L().Info("ip:", zap.String("ip", *IP), zap.Int("port", *Port))
 
 	server := grpc.NewServer()
 	proto.RegisterUserServerServer(server, &handler.UserServer{})
