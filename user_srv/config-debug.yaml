@@ -4,3 +4,9 @@ mysql:
   user: "root"
   password: "Root123456!"
   db: "mxshop_user_srv"
+
+consul:
+  host: "172.27.49.67"
+  port: 8500
+
+name: "user-srv"
