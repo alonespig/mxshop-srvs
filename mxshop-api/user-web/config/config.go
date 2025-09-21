@@ -3,6 +3,7 @@ package config
 type UserSrvConfig struct {
 	Host string `mapstructure:"host" json:"host"`
 	Port int    `mapstructure:"port" json:"port"`
+	Name string `mapstructure:"name" json:"name"`
 }
 
 type JwtConfig struct {
@@ -15,9 +16,20 @@ type ServerConfig struct {
 	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
 	JwtInfo     JwtConfig     `mapstructure:"jwt" json:"jwt"`
 	RedisInfo   RedisConfig   `mapstructure:"redis" json:"redis"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul" json:"consul"`
 }
 
 type RedisConfig struct {
 	Host string `mapstructure:"host" json:"host"`
 	Port int    `mapstructure:"port" json:"port"`
+}
+
+type ConsulConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port int    `mapstructure:"port" json:"port"`
+}
+
+type CheckConfig struct {
+	Interval                       string `mapstructure:"interval" json:"interval"`
+	DeregisterCriticalServiceAfter string `mapstructure:"deregister_critical_service_after" json:"deregister_critical_service_after"`
 }
