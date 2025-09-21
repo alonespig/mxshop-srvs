@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"mxshop-api/user-web/forms"
 	"mxshop-api/user-web/global"
 	"mxshop-api/user-web/global/response"
@@ -15,9 +14,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -44,55 +41,6 @@ func HandleGrpcErrorToHttp(err error, c *gin.Context) {
 }
 
 func GetUserList(c *gin.Context) {
-	zap.L().Debug("获取用户列表")
-
-	//从注册中心获取用户服务地址
-	cfg := api.DefaultConfig()
-	consulInfo := global.ServerConfig.ConsulInfo
-	cfg.Address = fmt.Sprintf("%s:%d", consulInfo.Host, consulInfo.Port)
-	zap.L().Debug("Address", zap.Any("cfg.Address", cfg.Address))
-
-	userSrvHost := ""
-	userSrvPort := 0
-
-	client, err := api.NewClient(cfg)
-	if err != nil {
-		zap.L().Error("[GetUserList] 创建consul客户端失败", zap.Error(err))
-		return
-	}
-
-	data, err := client.Agent().ServicesWithFilter(fmt.Sprintf(`Service == "%s"`, global.ServerConfig.UserSrvInfo.Name))
-
-	if err != nil {
-		zap.L().Error("[GetUserList] 获取用户服务地址失败", zap.Error(err))
-		return
-	}
-
-	zap.L().Debug("data", zap.Any("data", data))
-
-	for _, value := range data {
-		userSrvHost = value.Address
-		userSrvPort = value.Port
-		break
-	}
-
-	if userSrvHost == "" || userSrvPort == 0 {
-		zap.L().Error("[GetUserList] 获取用户服务地址失败")
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "用户服务不可达"})
-		return
-	}
-
-	zap.L().Debug("userSrvHost", zap.Any("userSrvHost", userSrvHost))
-	zap.L().Debug("userSrvPort", zap.Any("userSrvPort", userSrvPort))
-
-	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", userSrvHost, userSrvPort), grpc.WithInsecure())
-	if err != nil {
-		zap.L().Error("[GetUserList] 连接用户服务失败", zap.Error(err))
-		return
-	}
-	defer userConn.Close()
-	//调用接口
-	userSrvClient := proto.NewUserServerClient(userConn)
 
 	pn := c.DefaultQuery("pn", "1")
 	psize := c.DefaultQuery("psize", "10")
@@ -100,7 +48,7 @@ func GetUserList(c *gin.Context) {
 	pnInt, _ := strconv.ParseInt(pn, 10, 32)
 	psizeInt, _ := strconv.ParseInt(psize, 10, 32)
 
-	rsp, err := userSrvClient.GetUserList(context.Background(), &proto.PageInfo{
+	rsp, err := global.UserSrvClient.GetUserList(context.Background(), &proto.PageInfo{
 		Pn:    uint32(pnInt),
 		PSize: uint32(psizeInt),
 	})
@@ -140,16 +88,7 @@ func PassWordLogin(c *gin.Context) {
 		return
 	}
 
-	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserSrvInfo.Host,
-		global.ServerConfig.UserSrvInfo.Port), grpc.WithInsecure())
-	if err != nil {
-		zap.L().Error("[PassWordLogin] 连接用户服务失败", zap.Error(err))
-		return
-	}
-	defer userConn.Close()
-	userSrvClient := proto.NewUserServerClient(userConn)
-
-	rsp, err := userSrvClient.GetUserByMobile(context.Background(), &proto.MobileRequest{
+	rsp, err := global.UserSrvClient.GetUserByMobile(context.Background(), &proto.MobileRequest{
 		Mobile: passWordLoginForm.Mobile,
 	})
 
@@ -159,7 +98,7 @@ func PassWordLogin(c *gin.Context) {
 		return
 	}
 
-	passRep, err := userSrvClient.CheckPassWord(context.Background(), &proto.CheckPasswordInfo{
+	passRep, err := global.UserSrvClient.CheckPassWord(context.Background(), &proto.CheckPasswordInfo{
 		Password:          passWordLoginForm.PassWord,
 		EncryptedPassword: rsp.Password,
 	})
@@ -204,17 +143,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserSrvInfo.Host,
-		global.ServerConfig.UserSrvInfo.Port), grpc.WithInsecure())
-	if err != nil {
-		zap.L().Error("[Register] 连接用户服务失败", zap.Error(err))
-		return
-	}
-
-	defer userConn.Close()
-	userSrvClient := proto.NewUserServerClient(userConn)
-
-	user, err := userSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
+	user, err := global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
 		NickName: registerForm.Mobile,
 		Mobile:   registerForm.Mobile,
 		Password: registerForm.PassWord,

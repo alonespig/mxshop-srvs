@@ -1,7 +1,11 @@
 package global
 
-import "mxshop-api/user-web/config"
+import (
+	"mxshop-api/user-web/config"
+	"mxshop-api/user-web/proto"
+)
 
 var (
-	ServerConfig *config.ServerConfig = &config.ServerConfig{}
+	ServerConfig  *config.ServerConfig = &config.ServerConfig{}
+	UserSrvClient proto.UserServerClient
 )

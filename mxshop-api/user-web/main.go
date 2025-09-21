@@ -20,6 +20,8 @@ func main() {
 	//2. 初始化路由
 	Router := initialize.Routers()
 
+	initialize.InitSrvConn()
+
 	//4. 启动服务
 	if err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 		zap.L().Error("启动服务失败", zap.Error(err))
