@@ -9,6 +9,7 @@ import (
 	"mxshop/handler"
 	"mxshop/initialize"
 	"mxshop/proto"
+	"mxshop/utils"
 
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
@@ -23,9 +24,17 @@ func main() {
 	initialize.InitDB()
 
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 50051, "端口号")
+	Port := flag.Int("port", 0, "端口号")
 
 	flag.Parse()
+
+	if *Port == 0 {
+		var err error
+		*Port, err = utils.GetFreePort()
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	zap.L().Info("ip:", zap.String("ip", *IP), zap.Int("port", *Port))
 	zap.L().Info("config", zap.Any("config", global.ServerConfig))
@@ -49,7 +58,7 @@ func main() {
 	}
 
 	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("172.27.49.67:50051"),
+		GRPC:                           fmt.Sprintf("172.27.49.67:%d", *Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "15s",

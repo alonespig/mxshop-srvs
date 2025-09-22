@@ -9,9 +9,13 @@ import (
 	"go.uber.org/zap"
 )
 
+func GetEnvInfo(env string) bool {
+	viper.AutomaticEnv()
+	return viper.GetBool(env)
+}
+
 func InitConfig() {
-	// debug := GetEnvInfo("MXSHOP_DEBUG")
-	debug := false
+	debug := GetEnvInfo("MXSHOP_DEBUG")
 	configFilePrefix := "config"
 	configFileName := fmt.Sprintf("user-web/%s-pro.yaml", configFilePrefix)
 
