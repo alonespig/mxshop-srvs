@@ -19,8 +19,8 @@ type GoodsCategoryBrand struct {
 	BaseModel
 	CategoryID int32 `gorm:"type:int;index:idx_category_brand,unique"`
 	Category   Category
-	BrandID    int32 `gorm:"type:int;index:idx_category_brand,unique"`
-	Brands     Brands
+	BrandID    int32  `gorm:"type:int;index:idx_category_brand,unique"`
+	Brands     Brands `gorm:"foreignKey:BrandID"`
 }
 
 func (GoodsCategoryBrand) TableName() string {
@@ -42,8 +42,8 @@ type Goods struct {
 	BaseModel
 	CategoryID int32 `gorm:"type:int;not null"`
 	Category   Category
-	BrandID    int32 `gorm:"type:int;not null"`
-	Brands     Brands
+	BrandID    int32  `gorm:"type:int;not null"`
+	Brands     Brands `gorm:"foreignKey:BrandID"`
 
 	OnSale   bool `gorm:"type:bool;default:false;not null"`
 	ShipFree bool `gorm:"type:bool;default:false;not null"`
