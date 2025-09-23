@@ -5,6 +5,10 @@ import (
 	"mxshop/global"
 	"mxshop/model"
 	"mxshop/proto"
+
+	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // 品牌和轮播图
@@ -37,12 +41,45 @@ func (s *GoodsServer) BrandList(ctx context.Context, req *proto.BrandFilterReque
 	return &brandListResponse, nil
 }
 
-// func (s *GoodsServer) CreateBrand(context.Context, *BrandRequest) (*BrandInfoResponse, error) {
+// CreateBrand 新建品牌
+func (s *GoodsServer) CreateBrand(ctx context.Context, req *proto.BrandRequest) (*proto.BrandInfoResponse, error) {
+	if result := global.DB.First("name = ?", req.Name).First(&model.Brands{}); result.RowsAffected == 1 {
+		return nil, status.Errorf(codes.InvalidArgument, "品牌已存在")
+	}
+	brand := model.Brands{
+		Name: req.Name,
+		Logo: req.Logo,
+	}
 
-// }
-// func (s *GoodsServer) DeleteBrand(context.Context, *BrandRequest) (*empty.Empty, error) {
+	global.DB.Save(&brand)
 
-// }
-// func (s *GoodsServer) UpdateBrand(context.Context, *BrandRequest) (*empty.Empty, error) {
+	return &proto.BrandInfoResponse{
+		Id:   brand.ID,
+		Name: brand.Name,
+		Logo: brand.Logo,
+	}, nil
+}
 
-// }
+func (s *GoodsServer) DeleteBrand(ctx context.Context, req *proto.BrandRequest) (*empty.Empty, error) {
+	if result := global.DB.Delete(&model.Brands{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+	}
+	return &empty.Empty{}, nil
+}
+
+func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) (*empty.Empty, error) {
+	brand := model.Brands{}
+	if result := global.DB.First(&brand); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+	}
+
+	if req.Name != "" {
+		brand.Name = req.Name
+	}
+	if req.Logo != "" {
+		brand.Logo = req.Logo
+	}
+
+	global.DB.Save(&brand)
+	return &empty.Empty{}, nil
+}
