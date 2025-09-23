@@ -1,0 +1,16 @@
+{
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "password": "Root123456!",
+        "db": "mxshop_goods_srv"
+    },
+    "consul": {
+        "host": "172.27.49.67",
+        "port": 8500
+    },
+    "name": "goods-srv",
+    "tags": ["imooc", "bobby", "goods", "srv"],
+    "host": "172.27.49.67"
+}
