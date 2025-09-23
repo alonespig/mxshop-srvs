@@ -6,80 +6,71 @@ import (
 	"mxshop/model"
 	"mxshop/proto"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// 品牌和轮播图
-func (s *GoodsServer) BrandList(ctx context.Context, req *proto.BrandFilterRequest) (*proto.BrandListResponse, error) {
-	brandListResponse := proto.BrandListResponse{}
+// 轮播图
+func (s *GoodsServer) BannerList(ctx context.Context, req *emptypb.Empty) (*proto.BannerListResponse, error) {
+	bannerListResponse := proto.BannerListResponse{}
 
-	var brands []model.Brands
+	var banners []model.Banner
+	result := global.DB.Find(&banners)
+	bannerListResponse.Total = int32(result.RowsAffected)
 
-	result := global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&brands)
-
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	var total int64
-	global.DB.Model(&model.Brands{}).Count(&total)
-	brandListResponse.Total = int32(total)
-
-	var brandResponses []*proto.BrandInfoResponse
-
-	for _, brand := range brands {
-		brandResponses = append(brandResponses, &proto.BrandInfoResponse{
-			Id:   brand.ID,
-			Name: brand.Name,
-			Logo: brand.Logo,
+	var bannerReponses []*proto.BannerResponse
+	for _, banner := range banners {
+		bannerReponses = append(bannerReponses, &proto.BannerResponse{
+			Id:    banner.ID,
+			Image: banner.Image,
+			Index: banner.Index,
+			Url:   banner.Url,
 		})
 	}
 
-	brandListResponse.Data = brandResponses
+	bannerListResponse.Data = bannerReponses
 
-	return &brandListResponse, nil
+	return &bannerListResponse, nil
 }
 
-// CreateBrand 新建品牌
-func (s *GoodsServer) CreateBrand(ctx context.Context, req *proto.BrandRequest) (*proto.BrandInfoResponse, error) {
-	if result := global.DB.First("name = ?", req.Name).First(&model.Brands{}); result.RowsAffected == 1 {
-		return nil, status.Errorf(codes.InvalidArgument, "品牌已存在")
-	}
-	brand := model.Brands{
-		Name: req.Name,
-		Logo: req.Logo,
-	}
+func (s *GoodsServer) CreateBanner(ctx context.Context, req *proto.BannerRequest) (*proto.BannerResponse, error) {
+	banner := model.Banner{}
 
-	global.DB.Save(&brand)
+	banner.Image = req.Image
+	banner.Index = req.Index
+	banner.Url = req.Url
 
-	return &proto.BrandInfoResponse{
-		Id:   brand.ID,
-		Name: brand.Name,
-		Logo: brand.Logo,
-	}, nil
+	global.DB.Save(&banner)
+
+	return &proto.BannerResponse{Id: banner.ID}, nil
 }
 
-func (s *GoodsServer) DeleteBrand(ctx context.Context, req *proto.BrandRequest) (*empty.Empty, error) {
-	if result := global.DB.Delete(&model.Brands{}, req.Id); result.RowsAffected == 0 {
-		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
+	if result := global.DB.Delete(&model.Banner{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) (*empty.Empty, error) {
-	brand := model.Brands{}
-	if result := global.DB.First(&brand); result.RowsAffected == 0 {
-		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
+	var banner model.Banner
+
+	if result := global.DB.First(&banner, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
 	}
 
-	if req.Name != "" {
-		brand.Name = req.Name
+	if req.Url != "" {
+		banner.Url = req.Url
 	}
-	if req.Logo != "" {
-		brand.Logo = req.Logo
+	if req.Image != "" {
+		banner.Image = req.Image
+	}
+	if req.Index != 0 {
+		banner.Index = req.Index
 	}
 
-	global.DB.Save(&brand)
-	return &empty.Empty{}, nil
+	global.DB.Save(&banner)
+
+	return &emptypb.Empty{}, nil
 }
