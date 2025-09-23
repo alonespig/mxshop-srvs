@@ -1,18 +1,36 @@
 package handler
 
-// // 商品分类
-// func (g GoodsServer) GetAllCategorysList(context.Context, *empty.Empty) (*CategoryListResponse, error) {
+import (
+	"context"
+	"encoding/json"
+	"mxshop/global"
+	"mxshop/model"
+	"mxshop/proto"
 
-// }
-// func (g GoodsServer) GetSubCategory(context.Context, *proto.CategoryListRequest) (*SubCategoryListResponse, error) {
+	"github.com/golang/protobuf/ptypes/empty"
+)
 
-// }
-// func (g GoodsServer) CreateCategory(context.Context, *CategoryInfoRequest) (*CategoryInfoResponse, error) {
+// 商品分类
+func (g *GoodsServer) GetAllCategorysList(ctx context.Context, req *empty.Empty) (*proto.CategoryListResponse, error) {
+	var categorys []model.Category
+	global.DB.Where(&model.Category{Level: 1}).Preload("SubCategory.SubCategory").Find(&categorys)
+	data, _ := json.Marshal(categorys)
 
-// }
-// func (g GoodsServer) DeleteCategory(context.Context, *DeleteCategoryRequest) (*empty.Empty, error) {
+	return &proto.CategoryListResponse{
+		JsonData: string(data),
+	}, nil
+}
 
-// }
-// func (g GoodsServer) UpdateCategory(context.Context, *CategoryInfoRequest) (*empty.Empty, error) {
-
-// }
+// 获取子分类
+func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
+	return nil, nil
+}
+func (g *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
+	return nil, nil
+}
+func (g *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*empty.Empty, error) {
+	return nil, nil
+}
+func (g *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*empty.Empty, error) {
+	return nil, nil
+}
