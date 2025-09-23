@@ -1,0 +1,9 @@
+2025-09-23T11:59:15.188+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<tmp/nacos/log>   cacheDir:<tmp/nacos/cache>
+2025-09-23T11:59:15.692+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-srv.jsondevb41f37356deca0ea844659b2862347bf702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-09-23T11:59:15.696+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-09-23T11:59:15.706+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-srv.jsondevb41f37356deca0ea844659b2862347bf702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-09-23T11:59:46.196+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-09-23T11:59:46.207+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-srv.jsondevb41f37356deca0ea844659b2862347bf702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
