@@ -8,4 +8,5 @@ import (
 var (
 	ServerConfig  *config.ServerConfig = &config.ServerConfig{}
 	UserSrvClient proto.UserServerClient
+	NacosConfig   *config.NacosConfig = &config.NacosConfig{}
 )

@@ -33,3 +33,13 @@ type CheckConfig struct {
 	Interval                       string `mapstructure:"interval" json:"interval"`
 	DeregisterCriticalServiceAfter string `mapstructure:"deregister_critical_service_after" json:"deregister_critical_service_after"`
 }
+
+type NacosConfig struct {
+	Host      string `mapstructure:"host" json:"host"`
+	Port      uint64 `mapstructure:"port" json:"port"`
+	Namespace string `mapstructure:"namespace" json:"namespace"`
+	User      string `mapstructure:"user" json:"user"`
+	Password  string `mapstructure:"password" json:"password"`
+	DataId    string `mapstructure:"dataid" json:"dataid"`
+	Group     string `mapstructure:"group" json:"group"`
+}

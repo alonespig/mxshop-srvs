@@ -1,0 +1,12 @@
+2025-09-23T11:45:23.721+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<tmp/nacos/log>   cacheDir:<tmp/nacos/cache>
+2025-09-23T11:45:24.224+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-web.jsondevc63410f86f193cdd58b7a06d15ca2393702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-09-23T11:45:24.231+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-09-23T11:45:24.241+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-web.jsondevc63410f86f193cdd58b7a06d15ca2393702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-09-23T11:45:53.744+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-09-23T11:45:53.754+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-web.jsondevc63410f86f193cdd58b7a06d15ca2393702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-09-23T11:46:23.258+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-09-23T11:46:23.268+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user-web.jsondevc63410f86f193cdd58b7a06d15ca2393702f60a9-8bfb-4bbf-beca-ea56d8cb1c05 tenant:702f60a9-8bfb-4bbf-beca-ea56d8cb1c05] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

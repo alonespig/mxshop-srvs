@@ -1,22 +1,8 @@
-name: 'user-web'
-port: 8021
-
-user_srv:
-  host: '172.27.49.67'
-  port: 50051
-  name: 'user-srv'
-  
-jwt:
-  key: '897b246533bba9c636ea6c1039a858b1'
-
-redis:
-  host: '127.0.0.1'
-  port: 6379
-
-consul:
-  host: '172.27.49.67'
-  port: 8500
-  key: 'mxshop/web/user'
-  check:
-    interval: '5s'
-    deregister_critical_service_after: '15s'
+# nacos:
+host: '172.27.49.67'
+port: 8848
+namespace: '702f60a9-8bfb-4bbf-beca-ea56d8cb1c05'
+user: 'nacos'
+password: 'nacos'
+dataid: 'user-web.json'
+group: 'dev'
