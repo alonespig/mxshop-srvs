@@ -2,6 +2,7 @@ package goods
 
 import (
 	"context"
+	"mxshop-api/goods-web/forms"
 	"mxshop-api/goods-web/global"
 	"mxshop-api/goods-web/proto"
 	"net/http"
@@ -125,4 +126,37 @@ func List(c *gin.Context) {
 	reMap["data"] = goodsList
 
 	c.JSON(http.StatusOK, reMap)
+}
+
+func New(c *gin.Context) {
+	goodsForm := forms.GoodsForm{}
+	if err := c.ShouldBindJSON(&goodsForm); err != nil {
+		zap.L().Error("[New] 绑定商品表单失败", zap.Error(err))
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	goodsClient := global.GoodsSrvClient
+	rsp, err := goodsClient.CreateGoods(context.Background(), &proto.CreateGoodsInfo{
+		Name:            goodsForm.Name,
+		GoodsSn:         goodsForm.GoodsSn,
+		Stocks:          goodsForm.Stocks,
+		MarketPrice:     goodsForm.MarketPrice,
+		ShopPrice:       goodsForm.ShopPrice,
+		GoodsBrief:      goodsForm.GoodsBrief,
+		ShipFree:        *goodsForm.ShipFree,
+		Images:          goodsForm.Images,
+		DescImages:      goodsForm.DescImages,
+		GoodsFrontImage: goodsForm.FrontImage,
+		CategoryId:      goodsForm.CategoryId,
+		BrandId:         goodsForm.Brand,
+	})
+
+	if err != nil {
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	//TODO 商品的库存
+	c.JSON(http.StatusOK, rsp)
 }
