@@ -16,9 +16,4 @@ func InitUserRouter(Router *gin.RouterGroup) {
 		UserRouter.POST("/login", api.PassWordLogin)
 		UserRouter.POST("/register", api.Register)
 	}
-	UserRouter.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status": "ok",
-		})
-	})
 }
