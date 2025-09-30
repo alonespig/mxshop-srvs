@@ -205,3 +205,113 @@ func Detail(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, rspMap)
 }
+
+func Delete(c *gin.Context) {
+	goodsId := c.Param("id")
+	goodsIdInt, err := strconv.Atoi(goodsId)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	goodsClient := global.GoodsSrvClient
+	_, err = goodsClient.DeleteGoods(context.Background(), &proto.DeleteGoodsInfo{
+		Id: int32(goodsIdInt),
+	})
+
+	if err != nil {
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func Stocks(c *gin.Context) {
+	goodsId := c.Param("id")
+	goodsIdInt, err := strconv.Atoi(goodsId)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	zap.L().Info("[Stocks] 获取商品库存", zap.Int("goodsId", goodsIdInt))
+
+	// TODO 商品的库存
+	return
+}
+
+func UpdateStatus(c *gin.Context) {
+	goodsForm := forms.GoodsStatusForm{}
+	if err := c.ShouldBindJSON(&goodsForm); err != nil {
+		zap.L().Error("[UpdateStatus] 绑定商品状态表单失败", zap.Error(err))
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	goodsId := c.Param("id")
+	goodsIdInt, err := strconv.Atoi(goodsId)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	goodsClient := global.GoodsSrvClient
+	_, err = goodsClient.UpdateGoods(context.Background(), &proto.CreateGoodsInfo{
+		Id:     int32(goodsIdInt),
+		IsHot:  *goodsForm.IsHot,
+		OnSale: *goodsForm.OnSale,
+		IsNew:  *goodsForm.IsNew,
+	})
+
+	if err != nil {
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "修改成功",
+	})
+}
+
+func Update(c *gin.Context) {
+	goodsForm := forms.GoodsForm{}
+	if err := c.ShouldBindJSON(&goodsForm); err != nil {
+		zap.L().Error("[Update] 绑定商品表单失败", zap.Error(err))
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	goodsId := c.Param("id")
+	goodsIdInt, err := strconv.Atoi(goodsId)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	goodsClient := global.GoodsSrvClient
+	_, err = goodsClient.UpdateGoods(context.Background(), &proto.CreateGoodsInfo{
+		Id:              int32(goodsIdInt),
+		Name:            goodsForm.Name,
+		GoodsSn:         goodsForm.GoodsSn,
+		Stocks:          goodsForm.Stocks,
+		MarketPrice:     goodsForm.MarketPrice,
+		ShopPrice:       goodsForm.ShopPrice,
+		GoodsBrief:      goodsForm.GoodsBrief,
+		ShipFree:        *goodsForm.ShipFree,
+		Images:          goodsForm.Images,
+		DescImages:      goodsForm.DescImages,
+		GoodsFrontImage: goodsForm.FrontImage,
+		CategoryId:      goodsForm.CategoryId,
+		BrandId:         goodsForm.Brand,
+	})
+
+	if err != nil {
+		HandleGrpcErrorToHttp(err, c)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "更新成功",
+	})
+}
