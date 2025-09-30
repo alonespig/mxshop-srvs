@@ -49,6 +49,7 @@ func main() {
 	//注册健康检查服务
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
+	//注册服务到consul
 	cfg := api.DefaultConfig()
 	cfg.Address = fmt.Sprintf("%s:%d", global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
 

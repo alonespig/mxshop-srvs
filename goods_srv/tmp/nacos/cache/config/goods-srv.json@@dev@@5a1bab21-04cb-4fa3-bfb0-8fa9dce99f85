@@ -10,7 +10,5 @@
         "host": "172.27.49.67",
         "port": 8500
     },
-    "name": "goods-srv",
-    "tags": ["imooc", "bobby", "goods", "srv"],
-    "host": "172.27.49.67"
+    "name": "goods-srv"
 }

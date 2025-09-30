@@ -24,7 +24,7 @@ func main() {
 	initialize.InitDB()
 
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 50051, "端口号")
+	Port := flag.Int("port", 0, "端口号")
 
 	flag.Parse()
 
@@ -36,9 +36,14 @@ func main() {
 		}
 	}
 
-	zap.L().Info("ip:", zap.String("ip", *IP), zap.Int("port", *Port))
-	zap.L().Info("config", zap.Any("config", global.ServerConfig))
-
+	zap.L().Debug("ServerConfig", zap.String("ip", *IP), zap.Int("port", *Port), zap.String("name", global.ServerConfig.Name))
+	zap.L().Debug("MysqlInfo", zap.Any("mysqlInfo", global.ServerConfig.MysqlInfo))
+	zap.L().Debug("ConsulInfo", zap.Any("consulInfo", global.ServerConfig.ConsulInfo))
+	// Name       string       `mapstructure:"name" json:"name"`
+	// Tags       []string     `mapstructure:"tags" json:"tags"`
+	// Host       string       `mapstructure:"host" json:"host"`
+	// MysqlInfo  MysqlConfig  `mapstructure:"mysql" json:"mysql"`
+	// ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
 	server := grpc.NewServer()
 	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
@@ -58,7 +63,7 @@ func main() {
 	}
 
 	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
+		GRPC:                           fmt.Sprintf("%s:%d", "172.27.49.67", *Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "15s",

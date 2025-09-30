@@ -1,0 +1,21 @@
+{
+  "host": "172.27.49.67",
+  "name": "goods-web",
+  "port": 8022,
+  "tags": ["mxshop", "goods-web"],
+  "goods_srv": {
+    "name": "goods-srv"
+  },
+  "jwt": {
+    "key": "897b246533bba9c636ea6c1039a858b1"
+  },
+  "consul": {
+    "host": "172.27.49.67",
+    "port": 8500,
+    "key": "mxshop/web/user",
+    "check": {
+      "interval": "5s",
+      "deregister_critical_service_after": "15s"
+    }
+  }
+}
