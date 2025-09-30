@@ -37,3 +37,16 @@ func HandleGrpcErrorToHttp(err error, c *gin.Context) {
 		}
 	}
 }
+
+// func HandleValidatorError(c *gin.Context, err error) {
+// 	errs, ok := err.(validator.ValidationErrors)
+// 	if !ok {
+// 		c.JSON(http.StatusOK, gin.H{
+// 			"msg": err.Error(),
+// 		})
+// 	}
+// 	c.JSON(http.StatusBadRequest, gin.H{
+// 		"error": RemoveToStruct(errs.Translate(global.Trans)),
+// 	})
+// 	return
+// }
