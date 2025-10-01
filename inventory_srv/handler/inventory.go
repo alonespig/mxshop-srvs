@@ -17,7 +17,7 @@ type InventoryServer struct {
 
 func (s *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo) (*proto.GoodsInvInfo, error) {
 	var inv model.Inventory
-	if result := global.DB.First(&inv, req.GoodsId); result.RowsAffected == 0 {
+	if result := global.DB.Where(&model.Inventory{Goods: req.GoodsId}).First(&inv); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "库存不存在")
 	}
 
@@ -35,8 +35,7 @@ func (s *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emp
 	tx := global.DB.Begin()
 	for _, good := range req.GoodsInfo {
 		var inv model.Inventory
-		global.DB.First(&inv, good.GoodsId)
-		if result := global.DB.First(&inv, good.GoodsId); result.RowsAffected == 0 {
+		if result := global.DB.Where(&model.Inventory{Goods: good.GoodsId}).First(&inv); result.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, status.Errorf(codes.InvalidArgument, "库存不存在")
 		}
@@ -53,8 +52,7 @@ func (s *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	tx := global.DB.Begin()
 	for _, good := range req.GoodsInfo {
 		var inv model.Inventory
-		global.DB.First(&inv, good.GoodsId)
-		if result := global.DB.First(&inv, good.GoodsId); result.RowsAffected == 0 {
+		if result := global.DB.Where(&model.Inventory{Goods: good.GoodsId}).First(&inv); result.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, status.Errorf(codes.InvalidArgument, "库存不存在")
 		}
@@ -73,7 +71,7 @@ func (s *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 // 这是库存
 func (s *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (*empty.Empty, error) {
 	var inv model.Inventory
-	global.DB.First(&inv, req.GoodsId)
+	global.DB.Where(&model.Inventory{Goods: req.GoodsId}).First(&inv)
 
 	inv.Goods = req.GoodsId
 	inv.Stocks = req.Num

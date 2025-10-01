@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -20,6 +21,8 @@ func InitDB() {
 		global.ServerConfig.MysqlInfo.Host,
 		global.ServerConfig.MysqlInfo.Port,
 		global.ServerConfig.MysqlInfo.Name)
+
+	zap.S().Debugf("dsn: %s", dsn)
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),

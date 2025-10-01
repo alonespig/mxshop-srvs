@@ -47,4 +47,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	for i := 421; i <= 840; i++ {
+		inv := model.Inventory{
+			Goods:  int32(i),
+			Stocks: 100,
+		}
+		db.Save(&inv)
+	}
 }
