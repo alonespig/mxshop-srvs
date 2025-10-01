@@ -26,8 +26,26 @@ func (s *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 		Num:     inv.Stocks,
 	}, nil
 }
+
+// 库存归还
+// 1. 订单超时归还
+// 2. 订单创建失败
+// 3. 手动归还
 func (s *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*empty.Empty, error) {
-	return nil, nil
+	tx := global.DB.Begin()
+	for _, good := range req.GoodsInfo {
+		var inv model.Inventory
+		global.DB.First(&inv, good.GoodsId)
+		if result := global.DB.First(&inv, good.GoodsId); result.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, status.Errorf(codes.InvalidArgument, "库存不存在")
+		}
+		//扣减，会出现数据不一致的问题，锁，分布式锁
+		inv.Stocks += good.Num
+		tx.Save(&inv)
+	}
+	tx.Commit()
+	return &empty.Empty{}, nil
 }
 
 // 扣减库存
