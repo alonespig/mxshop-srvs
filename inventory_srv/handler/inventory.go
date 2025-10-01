@@ -29,8 +29,27 @@ func (s *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 func (s *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*empty.Empty, error) {
 	return nil, nil
 }
+
+// 扣减库存
 func (s *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty.Empty, error) {
-	return nil, nil
+	tx := global.DB.Begin()
+	for _, good := range req.GoodsInfo {
+		var inv model.Inventory
+		global.DB.First(&inv, good.GoodsId)
+		if result := global.DB.First(&inv, good.GoodsId); result.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, status.Errorf(codes.InvalidArgument, "库存不存在")
+		}
+		if inv.Stocks < good.Num {
+			tx.Rollback()
+			return nil, status.Errorf(codes.ResourceExhausted, "库存不足")
+		}
+		//扣减，会出现数据不一致的问题，锁，分布式锁
+		inv.Stocks -= good.Num
+		tx.Save(&inv)
+	}
+	tx.Commit()
+	return &empty.Empty{}, nil
 }
 
 // 这是库存
