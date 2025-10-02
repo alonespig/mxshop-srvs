@@ -6974,3 +6974,15 @@
 2025-09-30T22:04:04.714+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
 2025-09-30T22:04:04.725+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods-web.jsondevcc82f54006a978a5bf682c23b542f4025a1bab21-04cb-4fa3-bfb0-8fa9dce99f85 tenant:5a1bab21-04cb-4fa3-bfb0-8fa9dce99f85] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
 
+2025-10-02T20:31:20.971+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<tmp/nacos/log>   cacheDir:<tmp/nacos/cache>
+2025-10-02T20:31:21.475+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order-web.jsondev40e4d2118d147b40440a3b361800898017ee2894-6777-4223-a08e-c661bb2ee81f tenant:17ee2894-6777-4223-a08e-c661bb2ee81f] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-10-02T20:31:21.478+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-10-02T20:31:21.488+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order-web.jsondev40e4d2118d147b40440a3b361800898017ee2894-6777-4223-a08e-c661bb2ee81f tenant:17ee2894-6777-4223-a08e-c661bb2ee81f] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-10-02T20:31:50.989+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-10-02T20:31:51.000+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order-web.jsondev40e4d2118d147b40440a3b361800898017ee2894-6777-4223-a08e-c661bb2ee81f tenant:17ee2894-6777-4223-a08e-c661bb2ee81f] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-10-02T20:32:20.502+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-10-02T20:32:20.514+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order-web.jsondev40e4d2118d147b40440a3b361800898017ee2894-6777-4223-a08e-c661bb2ee81f tenant:17ee2894-6777-4223-a08e-c661bb2ee81f] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

@@ -13,8 +13,8 @@
         "host": "172.27.49.67",
         "port": 8500
     },
-    "order_srv":{
-        "name":"order-srv"
+    "goods_srv":{
+        "name":"goods-srv"
     },
     "inventory_srv":{
         "name":"inventory-srv"
