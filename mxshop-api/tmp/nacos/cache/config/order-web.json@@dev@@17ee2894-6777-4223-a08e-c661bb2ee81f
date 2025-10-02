@@ -9,6 +9,9 @@
   "order_srv": {
     "name": "order_srv"
   },
+  "inventory_srv": {
+    "name": "inventory_srv"
+  },
   "jwt": {
     "key": "897b246533bba9c636ea6c1039a858b1"
   },

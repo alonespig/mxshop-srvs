@@ -67,7 +67,7 @@ func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemReq
 }
 
 func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*empty.Empty, error) {
-	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods = ? and user = ?", req.GoodsId, req.UserId).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车商品不存在")
 	}
 	return &empty.Empty{}, nil
@@ -77,7 +77,7 @@ func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemReq
 func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemRequest) (*empty.Empty, error) {
 	var shopCart model.ShoppingCart
 
-	if result := global.DB.First(&shopCart, req.Id); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods = ? and user = ?", req.GoodsId, req.UserId).First(&shopCart); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车商品不存在")
 	}
 	if req.Nums > 0 {
@@ -253,6 +253,7 @@ func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterReque
 			Address: order.Address,
 			Name:    order.SignerName,
 			Mobile:  order.SingerMobile,
+			AddTime: order.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 	return &rsp, nil
