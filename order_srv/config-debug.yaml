@@ -1,8 +1,8 @@
 # nacos:
 host: '172.27.49.67'
 port: 8848
-namespace: '14a05a8c-044f-4db0-94d5-57327fa12be6'
+namespace: '17ee2894-6777-4223-a08e-c661bb2ee81f'
 user: 'nacos'
 password: 'nacos'
-dataid: 'inventory.json'
+dataid: 'order-srv.json'
 group: 'dev'

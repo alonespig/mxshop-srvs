@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"mxshop/global"
-	"mxshop/handler"
 	"mxshop/initialize"
 	"mxshop/proto"
 	"mxshop/utils"
@@ -45,7 +44,7 @@ func main() {
 	zap.L().Debug("ConsulInfo", zap.Any("consulInfo", global.ServerConfig.ConsulInfo))
 
 	server := grpc.NewServer()
-	proto.RegisterInventoryServer(server, &handler.InventoryServer{})
+	proto.RegisterOrderServer(server, &proto.UnimplementedOrderServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		panic(err)
