@@ -7,6 +7,8 @@ import (
 	"mxshop/proto"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type OrderServer struct {
@@ -62,7 +64,10 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	return nil, nil
 }
 func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*empty.Empty, error) {
-	return nil, nil
+	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "购物车商品不存在")
+	}
+	return &empty.Empty{}, nil
 }
 func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
 	return nil, nil
@@ -70,8 +75,23 @@ func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) 
 func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
 	return nil, nil
 }
+
+// 更新购物车记录，更新数量和选中状态
 func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemRequest) (*empty.Empty, error) {
-	return nil, nil
+	var shopCart model.ShoppingCart
+
+	if result := global.DB.First(&shopCart, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "购物车商品不存在")
+	}
+	if req.Nums > 0 {
+		shopCart.Nums = req.Nums
+	}
+	result := global.DB.Save(&shopCart)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &empty.Empty{}, nil
 }
 func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatus) (*empty.Empty, error) {
 	return nil, nil
