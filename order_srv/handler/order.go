@@ -37,6 +37,7 @@ func (s *OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*p
 	}
 	return &rsp, nil
 }
+
 func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemRequest) (*proto.ShopCartInfoResponse, error) {
 	//将商品添加到购物车
 	var shopCart model.ShoppingCart
@@ -59,21 +60,12 @@ func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemReq
 
 	return &proto.ShopCartInfoResponse{Id: shopCart.ID}, nil
 }
-func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoResponse, error) {
 
-	return nil, nil
-}
 func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*empty.Empty, error) {
 	if result := global.DB.Delete(&model.ShoppingCart{}, req.Id); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车商品不存在")
 	}
 	return &empty.Empty{}, nil
-}
-func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
-	return nil, nil
-}
-func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
-	return nil, nil
 }
 
 // 更新购物车记录，更新数量和选中状态
@@ -93,6 +85,50 @@ func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReq
 
 	return &empty.Empty{}, nil
 }
+
+func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoResponse, error) {
+
+	return nil, nil
+}
+
+func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
+	return nil, nil
+}
+
+func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
+	var orders []model.OrderInfo
+
+	var total int64
+	result := global.DB.Where(&model.OrderInfo{User: req.UserId}).Count(&total)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	rsp := proto.OrderListResponse{}
+	rsp.Total = int32(total)
+
+	result = global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&orders)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	for _, order := range orders {
+		rsp.Data = append(rsp.Data, &proto.OrderInfoResponse{
+			Id:      order.ID,
+			UserId:  order.User,
+			OrderSn: order.OrderSn,
+			PayType: order.PayType,
+			Status:  order.Status,
+			Post:    order.Post,
+			Total:   order.OrderMount,
+			Address: order.Address,
+			Name:    order.SignerName,
+			Mobile:  order.SingerMobile,
+		})
+	}
+	return &rsp, nil
+}
+
 func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatus) (*empty.Empty, error) {
 	return nil, nil
 }
