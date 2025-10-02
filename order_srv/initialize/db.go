@@ -15,12 +15,13 @@ import (
 )
 
 func InitDB() {
+	mysqlInfo := global.ServerConfig.MysqlInfo
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		global.ServerConfig.MysqlInfo.User,
-		global.ServerConfig.MysqlInfo.Password,
-		global.ServerConfig.MysqlInfo.Host,
-		global.ServerConfig.MysqlInfo.Port,
-		global.ServerConfig.MysqlInfo.Name)
+		mysqlInfo.User,
+		mysqlInfo.Password,
+		mysqlInfo.Host,
+		mysqlInfo.Port,
+		mysqlInfo.Name)
 
 	zap.S().Debugf("dsn: %s", dsn)
 

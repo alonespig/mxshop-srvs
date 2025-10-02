@@ -12,5 +12,11 @@
     "consul": {
         "host": "172.27.49.67",
         "port": 8500
+    },
+    "order_srv":{
+        "name":"order-srv"
+    },
+    "inventory_srv":{
+        "name":"inventory-srv"
     }
 }

@@ -87,6 +87,19 @@ func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReq
 }
 
 func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoResponse, error) {
+	//新建订单 访问商品微服务获取商品信息
+	//库存的扣减 访问库存微服务
+	//从购物车中取到选中的微服务
+	// 从购物车中删除已购买的记录
+	var goodsIds []int32
+	var shopCarts []model.ShoppingCart
+	if result := global.DB.Where(&model.ShoppingCart{User: req.UserId, Checked: true}).Find(&shopCarts); result.RowsAffected == 0 {
+		return nil, status.Error(codes.InvalidArgument, "没有选中结算的商品")
+	}
+
+	for _, shopCarts := range shopCarts {
+		goodsIds = append(goodsIds, shopCarts.Goods)
+	}
 
 	return nil, nil
 }

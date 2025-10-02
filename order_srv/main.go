@@ -25,6 +25,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
+	initialize.InitSrvConn()
 
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
 	Port := flag.Int("port", 0, "端口号")
