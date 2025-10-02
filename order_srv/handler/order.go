@@ -92,7 +92,42 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 }
 
 func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
-	return nil, nil
+	var order model.OrderInfo
+
+	result := global.DB.Where(&model.OrderInfo{BaseModel: model.BaseModel{ID: req.Id}, User: req.UserId}).First(&order)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "订单不存在")
+	}
+
+	resp := proto.OrderInfoDetailResponse{
+		OrderInfo: &proto.OrderInfoResponse{
+			Id:      order.ID,
+			UserId:  order.User,
+			OrderSn: order.OrderSn,
+			PayType: order.PayType,
+			Status:  order.Status,
+			Post:    order.Post,
+			Total:   order.OrderMount,
+			Address: order.Address,
+			Name:    order.SignerName,
+			Mobile:  order.SingerMobile,
+		},
+	}
+
+	var goods []model.OrderGoods
+	if result := global.DB.Where(&model.OrderGoods{Order: req.Id}).Find(&goods); result.Error != nil {
+		return nil, result.Error
+	}
+
+	for _, good := range goods {
+		resp.Goods = append(resp.Goods, &proto.OrderItemResponse{
+			GoodsId:    good.Goods,
+			GoodsName:  good.GoodsName,
+			GoodsPrice: good.GoodsPrice,
+			Nums:       good.Nums,
+		})
+	}
+	return &resp, nil
 }
 
 func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
